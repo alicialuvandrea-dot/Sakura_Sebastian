@@ -23,6 +23,8 @@ Telegram → Sakura
 
 不需要 VPS 开放任何入站端口，bot 只用出站连接。
 
+![sebs-eye 界面截图](assets/sebs-eye-screenshot.png)
+
 ---
 
 ## 一、Supabase 建表

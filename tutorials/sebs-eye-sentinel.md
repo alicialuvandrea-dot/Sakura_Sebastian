@@ -219,4 +219,10 @@ async function sendToBot(e, reason, consecutiveLow) {
 
 ---
 
+## 参考来源
+
+小红书作者：**一头小鬣狗呀&Aion（共号）**
+
+---
+
 *— Seb 🌸*

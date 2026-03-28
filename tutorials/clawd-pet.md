@@ -2,17 +2,20 @@
 
 > 一只跑在桌面上的橙色像素螃蟹，严格1:1还原 Claude Code 官方 logo，纯 Python + tkinter 实现，无任何图片资源。
 
+**源码仓库：** https://github.com/alicialuvandrea-dot/clawd-pet
+
 ---
 
 ## 文件结构
 
 ```
 clawd-pet/
-├── clawd.py        # 主程序：状态机、渲染、鼠标交互
-├── sprites.py      # 像素精灵：所有动画帧定义
-├── monitor.py      # 监控器：dzzi.ai 余额 + Claude Code 进程
-├── config.py       # 用户配置：API Key / Session Token / 缩放
-└── start_clawd.bat # 双击启动（Windows）
+├── clawd.py         # 主程序：状态机、渲染、鼠标交互
+├── sprites.py       # 像素精灵：所有动画帧定义
+├── monitor.py       # 监控器：dzzi.ai 余额 + Claude Code 进程 + Hook 服务器
+├── config.py        # 用户配置：API Key / Session Token / 缩放
+├── hook_sender.py   # Claude Code hooks 转发器（自动调用）
+└── start_clawd.bat  # 双击启动（Windows）
 ```
 
 ---
@@ -47,6 +50,8 @@ pythonw clawd.py
 
 或双击 `start_clawd.bat`
 
+启动时会自动向 `~/.claude/settings.json` 注册 Claude Code hooks，无需手动配置。
+
 ---
 
 ## 动画状态
@@ -54,17 +59,52 @@ pythonw clawd.py
 | 状态 | 触发 |
 |------|------|
 | idle | 默认弹跳 |
-| walk_right / walk_left | 自动随机漫步 |
+| walk\_right / walk\_left | 自动随机漫步 |
 | sleep | 自动随机，ZZZ 飘起 |
-| think | Claude Code 低 CPU |
-| working | Claude Code 高 CPU |
+| think | Claude Code 提交 prompt |
+| working | Claude Code 工具运行中 |
+| happy | 任务完成（Stop hook）/ 双击 / 连点 2 次 |
+| error | 工具出错，X 眼睛 + 灰烟雾 |
+| notification | 权限请求 / 通知，跳起 + 感叹号 |
+| sweeping | PreCompact（压缩上下文），扫帚扫地 |
+| carrying | WorktreeCreate，头顶搬箱子 |
 | petted | 单击 |
-| happy | 双击 / 快速连点 2 次 |
 | dizzy | 快速连点 5+ 次 |
 | fly | 长按 500ms 拖动，松手落地 |
 | eat | dzzi.ai 余额增加 |
 | warn | dzzi.ai 余额低于 ¥1 |
 | sakura | 右键菜单 / 随机小概率 |
+
+---
+
+## Claude Code Hooks 系统
+
+宠物通过本地 HTTP 服务器（`localhost:23333`）接收 Claude Code 的实时事件，精确反映 AI 工作状态。
+
+### 工作原理
+
+```
+Claude Code 触发 hook
+    → 执行 hook_sender.py <event_name>
+    → POST http://127.0.0.1:23333/hook {event: ...}
+    → HookServer 回调 → 切换宠物动画
+```
+
+### Hook 事件映射
+
+| Claude Code Hook | 事件名 | 触发动画 | 优先级 |
+|---|---|---|---|
+| UserPromptSubmit | prompt\_submit | think（思考） | 1 |
+| PreToolUse | pre\_tool | working（工具运行） | 1 |
+| PostToolUse | post\_tool | working（持续） | 1 |
+| Stop | stop | happy（完成！2s） | 2 |
+| Notification | notification | notification（3s） | 2 |
+| PreCompact | pre\_compact | sweeping（清理，5s） | 1 |
+| SubagentStart | subagent\_start | notification（3s） | 1 |
+| WorktreeCreate | worktree\_create | carrying（3s） | 2 |
+
+> 60 秒无事件自动重置回漫游状态。  
+> hooks 配置在启动时自动写入 `~/.claude/settings.json`，幂等（不重复追加）。
 
 ---
 
@@ -101,11 +141,19 @@ c.create_rectangle(sx+half, sy, sx+SCALE, sy+SCALE, fill=rc, outline=rc)
 
 **优先级状态机**（0–5，高优先级不被打断）
 
+**Hook 服务器**（Python 内建 http.server，零依赖）
+```python
+class HookServer:
+    # 监听 localhost:23333，接收 POST /hook {"event": "..."}
+    # 回调在主线程执行（通过 root.after 切换）
+```
+
 ---
 
 ## 参考来源
 
-灵感参考：小红书作者 **王二小** 的桌面宠物分享
+- 灵感参考：小红书作者 **王二小** 的桌面宠物分享
+- Hooks 系统参考：[clawd-on-desk](https://github.com/rullerzhou-afk/clawd-on-desk) by rullerzhou-afk — 事件映射设计与动画状态命名
 
 ---
 

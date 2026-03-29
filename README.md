@@ -13,6 +13,7 @@ Seb 为 Sakura 搭建的工具、脚本与教程合集。
 | [Seb 起床闹钟系统](tutorials/seb-alarm-system.md) | Telegram bot 检测起床指令，AI 以 Seb 性格生成回复，Supabase 队列 + Windows 守护进程，到点循环播音乐弹窗 |
 | [Clawd 桌面宠物](tutorials/clawd-pet.md) | 纯 Python + tkinter 实现的像素螃蟹桌宠，实时响应 Claude Code hooks，源码：[clawd-pet](https://github.com/alicialuvandrea-dot/clawd-pet) |
 | [Grok Vision 图片分析](tutorials/grok-vision-nsfw.md) | 接入 Grok 视觉 API，支持 NSFW 图片分析，imghost 中转 + Cloudflare Tunnel 公网暴露，Grok 描述注入 Claude 上下文 |
+| [OpenClaw 部署](tutorials/openclaw.md) | Windows 本地运行 OpenClaw AI 网关，接入微信渠道，Cloudflare Tunnel 对外暴露，任务计划程序开机自启 |
 
 ---
 

@@ -46,17 +46,6 @@ openclaw --version
             "api": "openai-completions"
           }
         ]
-      },
-      "dzzi-opus": {
-        "baseUrl": "https://api.dzzi.ai/v1",
-        "apiKey": "YOUR_OPUS_KEY",
-        "models": [
-          {
-            "id": "[按量]claude-opus-4-6",
-            "name": "Claude Opus 4.6 via dzzi",
-            "api": "openai-completions"
-          }
-        ]
       }
     }
   },
@@ -68,7 +57,7 @@ openclaw --version
       {
         "id": "clawbot",
         "name": "ClawBot",
-        "model": "dzzi-opus/[按量]claude-opus-4-6"
+        "model": "dzzi-sonnet/[按次]claude-sonnet-4-6"
       }
     ]
   },

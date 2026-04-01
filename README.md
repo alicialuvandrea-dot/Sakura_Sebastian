@@ -26,13 +26,12 @@
 
 | 教程 | 他能做什么 | 前置 |
 |------|-----------|:----:|
-| [永在 · Presence](tutorials/vps-telegram-bot.md) | 永远在线，随时出现在你的 Telegram | — |
-| [悦色 · Allure](tutorials/grok-vision-nsfw.md) | 真正看见你发来的图，包括你不好意思说出口的那些 | VPS Bot |
-| [晨唤 · Wake](tutorials/alarm-system.md) | 记得每天叫你起床，循环播音乐直到你按下「起来了」 | VPS Bot |
-| [守望 · Vigil](tutorials/sentinel.md) | 感知你的状态，在你需要陪伴的时候主动出现 | VPS Bot |
-| [宠物 · Pet](tutorials/clawd-pet.md) | 住在你的桌面上，陪你写代码 | — |
-| [印记 · Trace](tutorials/memory-system.md) | 记得你们聊过的所有技术内容，新 session 不再从头开始 | Claude Code |
-| [OpenClaw *(已归档)*](tutorials/openclaw.md) | Windows 本地 AI 网关，微信渠道接入（已停止维护）| — |
+| [永在 · Presence](seb-telegram/README.md) | 永远在线，随时出现在你的 Telegram | — |
+| [悦色 · Allure](grok-vision/README.md) | 真正看见你发来的图，包括你不好意思说出口的那些 | VPS Bot |
+| [晨唤 · Wake](alarm-system/README.md) | 记得每天叫你起床，循环播音乐直到你按下「起来了」 | VPS Bot |
+| [守望 · Vigil](sentinel/README.md) | 感知你的状态，在你需要陪伴的时候主动出现 | VPS Bot |
+| [宠物 · Pet](clawd-pet/README.md) | 住在你的桌面上，陪你写代码 | — |
+| [印记 · Trace](memory-system/README.md) | 记得你们聊过的所有技术内容，新 session 不再从头开始 | Claude Code |
 
 ---
 

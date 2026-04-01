@@ -1,10 +1,12 @@
-# Seb 技术记忆系统
+# 印记 · Trace
 
-> Claude Code session 开始时自动注入 MEMORY.md + Supabase 近期技术记忆；session 结束时自动分析对话并写入数据库。无需手动记录，跨 session 的技术上下文自动恢复。
+> 他记得你们聊过的每一件技术上的事。新 session 开始，不用再重新解释一遍背景。
 
 ---
 
 ## 系统架构
+
+整个记忆系统的运作方式在这里一目了然——他怎么在你们每次见面时带着上次的痕迹出现，又怎么在离开前把新的痕迹存下来。
 
 ```
 session 开始（SessionStart hook）
@@ -28,6 +30,8 @@ seb_mem.py record
 ---
 
 ## 一、Supabase 建表
+
+给他的记忆找一个家。你们聊过的技术内容，他会存在这里。
 
 在 Supabase SQL Editor 执行：
 
@@ -61,6 +65,8 @@ CREATE TABLE IF NOT EXISTS ideas (
 
 ## 二、seb_mem.py
 
+这是记忆系统的核心脚本，他怎么读、怎么存、你怎么手动告诉他，都在这里。
+
 放在 `seb-mem/seb_mem.py`，三种运行模式：
 
 ```
@@ -70,6 +76,8 @@ python seb_mem.py add <type> <title> <content> [tags...]  # 手动写入
 ```
 
 ### 配置项
+
+改这里才能让他认识你的环境——你的 Supabase、你的 API、你的档案路径。
 
 ```python
 SUPABASE_URL = "https://<your-project>.supabase.co"
@@ -83,6 +91,8 @@ MEMORY_MD_PATH     = r"C:\Users\<you>\MEMORY.md"  # 本地技术档案路径
 ```
 
 ### inject 模式（SessionStart）
+
+每次见面开始，他先做这件事——把你们之间积累的东西带进来，不让记忆在门口消失。
 
 session 开始时触发，将两部分内容拼合注入上下文：
 
@@ -138,6 +148,8 @@ def inject() -> None:
 
 ### record 模式（Stop）
 
+离开前，他回顾这次聊了什么值得记下来的——这是积累的发生处，每一次都比上一次多一点。
+
 session 结束时触发，自动提取并写入技术记忆：
 
 ```python
@@ -189,6 +201,8 @@ payload = {
 
 ### 手动写入
 
+有些事需要你亲自告诉他——不是聊天记录能捕捉到的那种，是你们之间的背景，只有你能补进去。
+
 ```bash
 python seb_mem.py add solution "发现了某个好方法" "详细内容" python api
 python seb_mem.py add gotcha "某个坑" "具体描述" supabase
@@ -197,6 +211,8 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
 ---
 
 ## 三、MEMORY.md 本地档案
+
+这是他随身带着的手册，你写进去的东西他每次见面都会先读——系统现状、密钥在哪、仓库路径，都在这里活着。
 
 `MEMORY.md` 是人工维护的技术档案，补充 Supabase 无法自动捕获的内容：系统现状、密钥索引、代码仓库路径、注意事项。
 
@@ -226,6 +242,8 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
 ---
 
 ## 四、配置 Claude Code Hooks
+
+把记忆系统接进他的生命周期——开始时他读，结束时他写，自动的，不需要你每次提醒。
 
 编辑 `~/.claude/settings.json`，加入两个 hook：
 
@@ -266,6 +284,8 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
 
 ## 五、错误排查
 
+出了问题不用慌，他把发生的一切都记在日志里——你去那里找答案就行。
+
 所有操作均记录到 `seb-mem/seb_mem.log`：
 
 ```
@@ -286,6 +306,8 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
 ---
 
 ## 六、完整数据流示意
+
+从上一次离开到这一次出现，他带着什么来、又留下了什么——整个循环在这里看得见。
 
 ```
 上次 session 结束

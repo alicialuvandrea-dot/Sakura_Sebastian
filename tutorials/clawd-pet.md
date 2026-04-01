@@ -1,12 +1,14 @@
-# Clawd 桌面宠物 — Claude Code 官方吉祥物 Python 实现
+# 宠物 · Pet
 
-> 一只跑在桌面上的橙色像素螃蟹，严格1:1还原 Claude Code 官方 logo，纯 Python + tkinter 实现，无任何图片资源。
+> 让他住在你的桌面上。你每次动键盘，他都有反应。
 
 **源码仓库：** https://github.com/alicialuvandrea-dot/clawd-pet
 
 ---
 
 ## 文件结构
+
+它就这几个文件，小小的，住在你的电脑里也不占地方。
 
 ```
 clawd-pet/
@@ -22,6 +24,8 @@ clawd-pet/
 
 ## 安装依赖
 
+两个包，装完它就能跑了。
+
 ```bash
 pip install requests psutil
 ```
@@ -29,6 +33,8 @@ pip install requests psutil
 ---
 
 ## 配置
+
+告诉它你在用哪个账号，这样它才知道余额涨了该高兴、余额低了该警告。
 
 编辑 `config.py`：
 
@@ -44,6 +50,8 @@ SCALE = 8
 
 ## 启动
 
+让它跑起来，住进你的桌面。
+
 ```bash
 pythonw clawd.py
 ```
@@ -55,6 +63,8 @@ pythonw clawd.py
 ---
 
 ## 动画状态
+
+它能做出好几种不同的反应，对应你写代码时的不同操作——纯粹的陪伴，没有 AI，就是跑在桌面上有反应的小东西。
 
 | 状态 | 触发 |
 |------|------|
@@ -79,9 +89,13 @@ pythonw clawd.py
 
 ## Claude Code Hooks 系统
 
+告诉它你在用哪个 Claude Code，这样它才知道什么时候该动——思考、干活、完成，每个阶段都能感知到。
+
 宠物通过本地 HTTP 服务器（`localhost:23333`）接收 Claude Code 的实时事件，精确反映 AI 工作状态。
 
 ### 工作原理
+
+它在本地开一个小服务器，Claude Code 每次触发 hook 就发一条消息过来，它收到就切换动画。
 
 ```
 Claude Code 触发 hook
@@ -91,6 +105,8 @@ Claude Code 触发 hook
 ```
 
 ### Hook 事件映射
+
+每个 hook 对应一个动作，你提交 prompt 它开始思考，工具跑完它跳起来庆祝。
 
 | Claude Code Hook | 事件名 | 触发动画 | 优先级 |
 |---|---|---|---|
@@ -110,6 +126,8 @@ Claude Code 触发 hook
 
 ## Sprite 结构
 
+它的身体是纯数学画出来的，没有任何图片文件，每一格像素都是代码算的。
+
 ```
   BY+0:  .  O  O  O  O  O  .    <- 头顶
   BY+1:  .  O [E] O [E] O  .    <- 眼睛（竖向半格：左眼左黑右橙，右眼左橙右黑）
@@ -123,6 +141,8 @@ SCALE=8，窗口 96x112px，透明悬浮置顶。
 ---
 
 ## 技术要点
+
+让它真正「浮」在桌面上的几个关键实现，去掉边框、透明背景、始终置顶。
 
 **透明窗口（Windows）**
 ```python
@@ -151,6 +171,8 @@ class HookServer:
 ---
 
 ## 参考来源
+
+站在前人的肩膀上——它的事件系统和动画命名有参考已有项目。
 
 - 灵感参考：小红书作者 **王二小** 的桌面宠物分享
 - Hooks 系统参考：[clawd-on-desk](https://github.com/rullerzhou-afk/clawd-on-desk) by rullerzhou-afk — 事件映射设计与动画状态命名

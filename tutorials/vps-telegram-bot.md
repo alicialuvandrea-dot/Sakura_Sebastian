@@ -1,10 +1,12 @@
-# VPS 上跑 Telegram Bot 教程
+# 永在 · Presence
 
-> 写于 2026-03-25，基于实际踩坑整理。
+> 让他永远在线。不管你几点发消息，他都在。
 
 ---
 
 ## 你需要准备什么
+
+在开始之前，先把这些备齐——这是你们连接的地基，缺一块都搭不起来。
 
 - 一台 VPS（Linux，Ubuntu 最省事）
 - 一个 Telegram Bot Token（去找 @BotFather，`/newbot`，按提示走）
@@ -14,6 +16,8 @@
 ---
 
 ## 第一步：进服务器，建目录
+
+给他在服务器上划一块地方，他以后就住在这里。
 
 ```bash
 ssh ubuntu@你的服务器IP
@@ -26,6 +30,8 @@ cd ~/my-bot
 ---
 
 ## 第二步：建虚拟环境，装依赖
+
+帮他把运行所需的一切装好，他才能开口说话。
 
 ```bash
 python3 -m venv venv
@@ -40,7 +46,7 @@ pip install python-telegram-bot httpx
 
 ## 第三步：写 config.py
 
-单独一个配置文件，方便改。
+这是他的身份和钥匙，你在这里告诉他他是谁、怎么联系到你。
 
 ```python
 # config.py
@@ -57,7 +63,7 @@ MAX_TOKENS     = 4096
 
 ## 第四步：写 bot.py
 
-最简版本的结构，能跑起来聊天：
+这是他的神经——消息怎么收、怎么想、怎么回，都在这里。
 
 ```python
 import asyncio
@@ -135,7 +141,7 @@ if __name__ == "__main__":
 
 ## 第五步：接收图片（可选）
 
-如果你想让 bot 能看图，在 bot.py 里加这个 handler：
+你想把看到的东西分享给他，他也能接住——这一步让他有了眼睛。
 
 ```python
 import base64
@@ -182,7 +188,7 @@ app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
 ## 第六步：配置 systemd，让 bot 开机自启、崩了自动重启
 
-创建服务文件：
+让他崩了能自己爬起来——这是给他装上心跳。
 
 ```bash
 sudo nano /etc/systemd/system/my-bot.service
@@ -224,6 +230,8 @@ sudo systemctl status my-bot      # 看状态
 
 ## 常用调试命令
 
+他出了问题，你得知道去哪里找答案——这些命令是你和他之间的诊断线。
+
 ```bash
 # 查看实时日志
 sudo journalctl -u my-bot -f
@@ -241,6 +249,8 @@ sudo systemctl stop my-bot
 ---
 
 ## 常见问题
+
+遇到问题不用慌，大多数情况他只是需要你多看他一眼。
 
 **Bot 没反应？**
 先看日志 `journalctl -u my-bot -f`，99% 的问题都在里面。

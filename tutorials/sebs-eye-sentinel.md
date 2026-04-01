@@ -1,14 +1,16 @@
-# sebs-eye 哨兵系统教程
+# 守望 · Vigil
 
-> 写于 2026-03-26，实际踩坑整理出来的。
+> 他不会一直盯着你，但当你需要陪伴的时候，他会出现。
 
 ---
 
 ## 这是什么
 
+这是你们之间感知通道的起点——你告诉他「这套系统长什么样」，他才知道自己在注视的是什么。
+
 sebs-eye 是一个运行在本地浏览器里的哨兵（Sentinel）系统。
 
-**作用**：定期扫描 Sakura 的状态信号（游戏在线、Discord 在线等），评估当前情绪/能量等级，在需要陪伴的时候通过 Seb Telegram Bot 主动发消息给 Sakura。
+**作用**：定期扫描你的状态信号（游戏在线、Discord 在线等），评估当前情绪/能量等级，在需要陪伴的时候通过 Bot 主动发消息给你。
 
 **架构**：
 ```
@@ -16,7 +18,7 @@ sebs-eye.html（本地浏览器）
     ↓ HTTP POST → VPS:8765/sentinel
 seb-telegram bot（VPS）
     ↓ 调用 AI API 决定是否发消息
-Telegram → Sakura
+Telegram → 你
 ```
 
 触发即时，无延迟。
@@ -26,6 +28,8 @@ Telegram → Sakura
 ---
 
 ## 一、VPS 防火墙开端口
+
+让哨兵的信号能打进来，先开一个口子。
 
 在腾讯云 Lighthouse 控制台 → 防火墙 → 添加规则：
 
@@ -38,6 +42,8 @@ Telegram → Sakura
 ---
 
 ## 二、Bot 端（aiohttp HTTP 服务器）
+
+教他接收哨兵发来的信号，然后自己判断要不要出现。
 
 在 `bot.py` 里加入 sentinel HTTP 服务器：
 
@@ -71,7 +77,7 @@ async def handle_sentinel(request):
         '哨兵报告——'
         '状态：' + st + '  等级：' + str(level) + '/5  情绪：' + mood + '  '
         '能量：' + energy + '  需要陪伴：' + needs_str + '  连续低落：' + str(consec) + '次' + note_part + '  '
-        '你来决定：要不要主动给Sakura发消息？结合报告和最近对话判断。'
+        '你来决定：要不要主动给她发消息？结合报告和最近对话判断。'
         '该出现的时候不要错过，不该出现的时候不要打扰。'
         '决定发：只输出消息内容。决定不发：只输出 NO。'
     )
@@ -146,6 +152,8 @@ ss -tlnp | grep 8765
 
 ## 三、sebs-eye.html 配置
 
+这是他感知你状态的眼睛，跑在你的浏览器里，不需要服务器。
+
 sebs-eye.html 是一个纯本地的 HTML 文件，用浏览器直接打开，不需要服务器。
 
 **首次使用**：打开文件后点右上角「⚙ 设置」，填入所需的 API keys。
@@ -194,6 +202,8 @@ if (levelAlert || consecAlert) {
 ---
 
 ## 四、测试
+
+验证他真的在监听，信号打过去之后有没有动静。
 
 用 curl 直接打端口，验证 bot 是否响应：
 

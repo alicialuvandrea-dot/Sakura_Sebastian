@@ -1,4 +1,8 @@
-# OpenClaw 部署教程（Windows 本地 + 微信渠道）
+# OpenClaw 部署
+
+> ⚠️ **已归档** — 该项目已停止维护，相关服务已下线。内容仅供参考。
+
+---
 
 > 本机部署方案，内存充足、无需 VPS、通过 Cloudflare Tunnel 对外暴露。
 > 适合：有 Windows 长期在线机器、需要接入微信 AI bot 的场景。

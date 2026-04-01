@@ -64,7 +64,7 @@
 | 分类 | 技术 |
 |------|------|
 | **Bot 运行时** | Python · python-telegram-bot · httpx · aiohttp · systemd |
-| **AI** | OpenAI 兼容 API（dzzi.ai 中转）· Claude opus 4.6 · Grok 4.1 fast（视觉）|
+| **AI** | OpenAI 兼容 API（dzzi.ai 中转）· Claude opus 4.6（主对话）· Grok 4.1 fast（图片视觉）· Claude haiku 4.5（技术记忆提取）· Claude sonnet 4.6（Claude Code）|
 | **数据库** | Supabase — `memories`（情感记忆）· `tech_memory`（技术记忆）· `alarms`（闹钟队列）· `ideas`（技术想法）|
 | **本地工具** | Python + tkinter · Windows Task Scheduler · Claude Code hooks |
 | **图片中转** | aiohttp 静态文件服务 · Cloudflare Tunnel |

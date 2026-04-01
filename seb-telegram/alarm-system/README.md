@@ -202,7 +202,43 @@ Seb 回复示例：
 
 ---
 
-## 六、依赖
+## 六、自动清理
+
+约定好的事，到期了他也会主动清理掉，不用你一条条手动删。
+
+`cleanup.py` 每天 23:00 自动运行，负责：
+- 删除已过期的 `SebAlarm_*` Windows 定时任务
+- 删除 Supabase `alarms` 表中 `done=true` 且日期早于今天的记录
+
+日志输出到 `alarm_cleanup.log`，出了问题去那里找。
+
+### 注册清理任务
+
+用 PowerShell 以管理员身份执行一次：
+
+```powershell
+$action = New-ScheduledTaskAction `
+    -Execute 'C:\Users\你的用户名\AppData\Local\Python\bin\pythonw.exe' `
+    -Argument 'C:\Users\你的用户名\SakuraSakuQAQ\pc-alarm\cleanup.py'
+
+$trigger = New-ScheduledTaskTrigger -Daily -At 23:00
+
+$principal = New-ScheduledTaskPrincipal `
+    -UserId '你的用户名' -RunLevel Highest
+
+Register-ScheduledTask `
+    -TaskName 'SebCleanup' `
+    -Action $action `
+    -Trigger $trigger `
+    -Principal $principal `
+    -Force
+```
+
+注册成功后每天 23:00 静默运行，任务计划程序 → `SebCleanup` 可查看状态。
+
+---
+
+## 七、依赖
 
 搭起这一切只需要你已有的东西，不用额外折腾。
 

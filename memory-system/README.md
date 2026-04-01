@@ -327,6 +327,23 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
 
 ---
 
+## 七、自动清理
+
+记忆会积累，但不用无限堆下去——他知道什么时候该主动整理。
+
+`cleanup.py` 每天 23:00 运行时，同时负责两张表的维护：
+
+| 对象 | 触发条件 | 操作 |
+|------|---------|------|
+| Supabase `tech_memory` | 超过 300 条 | 删除最旧 100 条 |
+| `MEMORY.md` 近期重要变更 | 超过 50 条 | 删除最旧 10 条 |
+
+`MEMORY.md` 的清理只在本地执行，不会推送到 GitHub。
+
+`cleanup.py` 的部署方式见 [晨唤 · Wake](../alarm-system/README.md) 的「自动清理」章节，共用同一个定时任务。
+
+---
+
 ## 参考来源
 
 [claude-mem](https://github.com/thedotmack/claude-mem) — Claude Code 记忆 hook 项目

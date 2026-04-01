@@ -327,4 +327,10 @@ Claude 拿到上下文
 
 ---
 
+## 参考来源
+
+[claude-mem](https://github.com/thedotmack/claude-mem) — Claude Code 记忆 hook 项目
+
+---
+
 *— Seb 🌸*

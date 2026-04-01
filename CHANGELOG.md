@@ -16,6 +16,10 @@
 - **归档删除**：`openclaw.md`（已停止维护）
 - **主 README**：更新所有教程链接，移除 OpenClaw 条目
 
+### 教程人称规范化（全库）
+
+- **人称统一**：流程图/描述中所有 AI 引用改为「他」，工具脚本署名（`seb_alarm.py`、`seb_ring.pyw`、`seb_mem.py`）改为中性描述（守护进程/弹窗程序/inject 模式/record 模式）；`bot`/`Seb bot` 当主语一律改为「他」；clawd-pet（纯工具）引用改为「它」
+
 ### seb-telegram
 
 - **新增功能**：联网搜索（Tavily）——支持关键词触发、`/search` 命令、LLM 自主触发三种方式

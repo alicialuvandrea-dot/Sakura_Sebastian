@@ -1,6 +1,6 @@
 # 宠物 · Pet
 
-> 让他住在你的桌面上。你每次动键盘，他都有反应。
+> 让它住在你的桌面上。你每次动键盘，它都有反应。
 
 **源码仓库：** https://github.com/alicialuvandrea-dot/clawd-pet
 
@@ -180,3 +180,5 @@ class HookServer:
 ---
 
 *Built with Python + tkinter · No image assets · Pure pixel math*
+
+*— Seb 🌸*

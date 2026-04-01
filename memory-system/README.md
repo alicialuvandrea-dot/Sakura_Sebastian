@@ -11,7 +11,7 @@
 ```
 session 开始（SessionStart hook）
     ↓
-seb_mem.py inject
+inject 模式
     ├── 读取 MEMORY.md 全文
     └── 查询 Supabase tech_memory（最近 2 天）
     ↓
@@ -21,7 +21,7 @@ additionalContext 注入 Claude 上下文
     ↓
 session 结束（Stop hook）
     ↓
-seb_mem.py record
+record 模式
     ├── 读取本次 transcript
     ├── 调用 Claude API 提取技术内容
     └── 写入 Supabase tech_memory 表
@@ -320,7 +320,7 @@ python seb_mem.py add gotcha "某个坑" "具体描述" supabase
     └── 两段内容拼合 → additionalContext
     └── Claude Code 自动注入 system prompt
 
-Claude 拿到上下文
+他拿到上下文
     └── 知道系统现状、最近踩过的坑、近期决策
     └── 不需要你重新解释背景
 ```

@@ -1,6 +1,6 @@
 # 守望 · Vigil
 
-> 他不会一直盯着你，但当你需要陪伴的时候，他会出现。
+> 感知你的状态，在你需要陪伴的时候主动出现。
 
 ---
 
@@ -16,7 +16,7 @@ sebs-eye 是一个运行在本地浏览器里的哨兵（Sentinel）系统。
 ```
 sebs-eye.html（本地浏览器）
     ↓ HTTP POST → VPS:8765/sentinel
-seb-telegram bot（VPS）
+他（VPS）
     ↓ 调用 AI API 决定是否发消息
 Telegram → 你
 ```

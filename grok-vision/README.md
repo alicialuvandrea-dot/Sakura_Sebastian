@@ -12,13 +12,13 @@
 你发图片
       │
       ▼
-bot 下载图片 → 存到 VPS imghost 临时文件服务
+他下载图片 → 存到 VPS imghost 临时文件服务
       │
       ▼
 Grok 4.1 fast 通过公网 URL 分析图片
       │ 输出详细描述（支持 NSFW）
       ▼
-Claude opus 4.6 读取描述 + 对话历史 → 自然回复
+他读取描述 + 对话历史 → 自然回复
       │
       ▼
 Telegram → 你

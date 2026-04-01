@@ -6,7 +6,7 @@
 
 ## 架构
 
-你发给他的图，走了这样一段路才到他眼前。
+你发给他的图，他先判断是什么，再决定怎么看。
 
 ```
 你发图片
@@ -15,27 +15,35 @@
 他下载图片 → 存到 VPS imghost 临时文件服务
       │
       ▼
-Grok 4.1 fast 通过公网 URL 分析图片
-      │ 输出详细描述（支持 NSFW）
-      ▼
-他读取描述 + 对话历史 → 自然回复
+视觉服务判断：NSFW？
+      │
+      ├─ 否 ──→ 他直接看图片 → 自然回复
+      │
+      └─ 是 ──→ 视觉服务详细描述图片内容
+                    │
+                    ▼
+               他读取描述 + 对话历史 → 自然回复
       │
       ▼
 Telegram → 你
 ```
 
+imghost 临时文件在回复后自动删除。
+
 ---
 
 ## 为什么需要 imghost 中转
 
-Telegram 的图片他直接拿不到。想让他真正看见，需要这个中间人。
+视觉服务判断 NSFW 时需要公网 URL，这是绕不过去的一步。
 
-dzzi 中转的 Grok 视觉 API：
+视觉 API 的限制：
 - ✅ 支持公网 URL 图片
 - ❌ 不支持 base64 图片（400 报错）
 - ❌ 无法访问 Telegram 内部文件 URL（需要 bot token 鉴权）
 
-因此需要一个临时的公网文件服务，把图片暴露出去给 Grok 拉取。
+所以每张图都先上传 imghost 拿到公网 URL，让视觉服务做分类判断。判断完成后：
+- 非 NSFW：用本地 base64 直接交给他，不再调用视觉服务
+- NSFW：继续用 URL 让视觉服务详细描述，再由他回复
 
 ---
 
@@ -95,13 +103,15 @@ sudo systemctl start imghost
 
 ### 3. config.py 配置
 
-把 Grok 的钥匙交给他，他才知道该往哪里看。
+把视觉服务的钥匙和 imghost 路径告诉他。
 
 ```python
 GROK_KEY        = "your-grok-api-key"
 GROK_BASE       = "https://api.dzzi.ai/v1"
 GROK_MODEL      = "x-ai/grok-4.1-fast"
 GROK_MAX_TOKENS = 1024
+IMGHOST_DIR     = "/home/ubuntu/imghost/files"
+IMGHOST_URL     = "https://imghost.sebsakura.top"
 ```
 
 ### 4. 重启 seb bot
@@ -130,9 +140,10 @@ sudo systemctl restart seb-telegram
 
 他看过就忘，不会留着——你可以放心把那些图发给他。
 
-- 图片分析完成后自动删除临时文件，不会长期存储
-- Grok 分析提示词：无 caption 时默认「请详细描述图片内容，包括人物、场景、动作、细节」；有 caption 时用 caption 作为提示
-- GROK_MAX_TOKENS 控制描述长度，默认 1024，可适当增大
+- 每张图都会经过 imghost 上传（视觉服务分类需要），处理完后自动删除
+- 非 NSFW：视觉服务只做一次分类判断（5 tokens），之后由他直接看图，不再调用视觉服务
+- NSFW：视觉服务详细描述（最多 `GROK_MAX_TOKENS` tokens），他根据描述回复
+- 视觉服务分类失败时默认走非 NSFW 路径，不会因此卡住
 
 ---
 

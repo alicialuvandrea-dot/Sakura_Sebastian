@@ -16,6 +16,10 @@
 - **归档删除**：`openclaw.md`（已停止维护）
 - **主 README**：更新所有教程链接，移除 OpenClaw 条目
 
+### grok-vision
+
+- **架构升级**：图片处理改为视觉服务 NSFW 分流——视觉服务先做分类判断，非 NSFW 由他直接看图，NSFW 才走视觉服务描述路径；config 新增 `IMGHOST_DIR` / `IMGHOST_URL`；流程图移除服务署名
+
 ### alarm-system
 
 - **新增章节**：「六、自动清理」——cleanup.py 每天 23:00 清理过期 SebAlarm_* 任务和 Supabase done 记录，含 PowerShell 注册命令

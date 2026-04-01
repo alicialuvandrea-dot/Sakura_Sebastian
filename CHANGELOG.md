@@ -16,6 +16,14 @@
 - **归档删除**：`openclaw.md`（已停止维护）
 - **主 README**：更新所有教程链接，移除 OpenClaw 条目
 
+### alarm-system
+
+- **新增章节**：「六、自动清理」——cleanup.py 每天 23:00 清理过期 SebAlarm_* 任务和 Supabase done 记录，含 PowerShell 注册命令
+
+### memory-system
+
+- **新增章节**：「七、自动清理」——cleanup.py 同时维护 tech_memory（>300 条删最旧 100）和 MEMORY.md 近期变更（>50 条删最旧 10），交叉引用晨唤教程部署方式
+
 ### 目录结构调整
 
 - **目录重组**：alarm-system / grok-vision / sentinel 三个基于 Telegram bot 的功能教程移入 `seb-telegram/` 子目录；主 README 链接同步更新

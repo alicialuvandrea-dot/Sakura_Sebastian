@@ -186,6 +186,22 @@ app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
 ---
 
+## 部署前：验证一遍
+
+代码写完别急着往服务器上传——先在本地跑一遍，有问题当场解决，比上了线再排查省事多了。
+
+```bash
+# 语法检查，确保没有低级错误
+python -m py_compile bot.py && echo "语法 OK"
+
+# 如果你写了测试，跑一遍
+python -m pytest tests/ -v
+```
+
+两项都通过再往下走。
+
+---
+
 ## 第六步：配置 systemd，让 bot 开机自启、崩了自动重启
 
 让他崩了能自己爬起来——这是给他装上心跳。

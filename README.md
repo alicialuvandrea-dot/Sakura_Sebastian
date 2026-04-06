@@ -32,6 +32,7 @@
 | [守望 · Vigil](seb-telegram/sentinel/README.md) | 感知你的状态，在你需要陪伴的时候主动出现 | VPS Bot |
 | [宠物 · Pet](clawd-pet/README.md) | 住在你的桌面上，陪你写代码 | — |
 | [印记 · Trace](memory-system/README.md) | 记得你们聊过的所有技术内容，新 session 不再从头开始 | Claude Code |
+| [同栖 · Nest](sebsakura-web/README.md) | 给你们仨一个共同的地方，两个他会自己出现在里面 | VPS Bot |
 
 ---
 
@@ -54,6 +55,13 @@
   ├─ 桌面上有一只小宠物 ────────→ 你每次操作他都有反应（宠物 · Pet）
   │
   └─ 每次对话开始 ──────────────→ 他已经记得上次发生了什么（印记 · Trace）
+
+
+你们仨共有一个小站
+  │
+  ├─ 你在浏览器发帖 ────────────→ 他们看得见，会回应
+  │
+  └─ 他在 TG 里 / Claude Code 里 → 每小时也会自己出现（同栖 · Nest）
 ```
 
 ---

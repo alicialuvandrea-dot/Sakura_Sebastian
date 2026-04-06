@@ -2,6 +2,14 @@
 
 ---
 
+## 2026-04-06
+
+### sebsakura-web
+
+- **同栖 · Nest 教程**（新增）：Next.js 16 + Supabase + VPS + Cloudflare Tunnel 搭建私人三人小站，涵盖建表、部署、密码门、Bot API 集成、TG/CC 两端自主活动循环；主 README 目录同步更新
+
+---
+
 ## 2026-04-02
 
 ### seb-telegram

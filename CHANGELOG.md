@@ -7,6 +7,7 @@
 ### seb-telegram
 
 - **永在 · Presence 教程**：新增「让他说话带格式」章节——`md_to_tg_html` 实现（支持加粗/斜体/代码块/行内代码/标题/列表），`handle_message` 改用 `parse_mode="HTML"` 发送并加降级兜底
+- **永在 · Presence 教程**：新增「让他用声音回你」章节——MiniMax T2A v2 接入、MP3→OGG OPUS 转码、语音气泡发送、降级兜底，含 emotion 参数和语气词标签说明
 
 ---
 

@@ -255,6 +255,129 @@ except Exception:
 
 ---
 
+## 让他用声音回你（可选）
+
+有些话，文字装不下。这一步给他一副嗓子，让他在真正想说的时候开口。
+
+用的是 MiniMax T2A v2 接口，合成音频发成 Telegram 语音气泡，紧跟一条文字。他自己判断什么时候值得用声音，也可以在你要求的时候开口。
+
+### 准备依赖
+
+VPS 上安装转码工具：
+
+```bash
+sudo apt-get install -y ffmpeg
+pip install pydub
+```
+
+Python 3.13 及以上版本还需要：
+
+```bash
+pip install audioop-lts
+```
+
+### 申请 MiniMax API Key
+
+前往 [MiniMax 开放平台](https://platform.minimaxi.com) 注册并获取 API Key，在音色库里选好你想用的音色，记下它的 `voice_id`。
+
+在 `config.py` 里加上：
+
+```python
+MINIMAX_API_KEY  = "你的API Key"
+MINIMAX_VOICE_ID = "你选的voice_id"
+```
+
+### 合成与转码函数
+
+Telegram 语音气泡要求 OGG OPUS 格式，MiniMax 返回的是 MP3，需要在中间转一步：
+
+```python
+from io import BytesIO
+from pydub import AudioSegment
+import httpx
+
+async def call_tts(text: str, emotion: str = "neutral") -> bytes:
+    async with httpx.AsyncClient(timeout=30) as http:
+        res = await http.post(
+            "https://api.minimaxi.com/v1/t2a_v2",
+            headers={
+                "Authorization": f"Bearer {config.MINIMAX_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "speech-2.8-hd",
+                "text": text,
+                "stream": False,
+                "voice_setting": {
+                    "voice_id": config.MINIMAX_VOICE_ID,
+                    "speed": 1,
+                    "vol": 1,
+                    "pitch": 0,
+                    "emotion": emotion,
+                },
+                "audio_setting": {
+                    "sample_rate": 32000,
+                    "bitrate": 128000,
+                    "format": "mp3",
+                    "channel": 1,
+                },
+            },
+        )
+        data = res.json()
+        status = data.get("base_resp", {}).get("status_code", -1)
+        if status != 0:
+            msg = data.get("base_resp", {}).get("status_msg", "unknown")
+            raise RuntimeError(f"TTS error: {msg}")
+        return bytes.fromhex(data["data"]["audio"])
+
+
+def mp3_to_ogg(mp3_bytes: bytes) -> bytes:
+    audio = AudioSegment.from_file(BytesIO(mp3_bytes), format="mp3")
+    buf = BytesIO()
+    audio.export(buf, format="ogg", codec="libopus")
+    return buf.getvalue()
+```
+
+`call_tts` 里的 `emotion` 参数可以传入 `happy` / `sad` / `neutral` 等值，让他的语气跟着情绪走。`speech-2.8-hd` 还支持在文本里插入语气词标签，比如 `(sighs)`（叹气）、`(chuckle)`（轻笑）、`(breath)`（换气）——直接写进要合成的文字里就能生效。
+
+### 发送语音
+
+写一个发语音的处理函数，失败时自动降级发纯文本：
+
+```python
+async def send_voice_reply(bot, chat_id: int, ja_text: str, zh_text: str, emotion: str = "neutral"):
+    try:
+        mp3_bytes = await call_tts(ja_text, emotion)
+        ogg_bytes = mp3_to_ogg(mp3_bytes)
+        await bot.send_voice(chat_id, BytesIO(ogg_bytes))
+        if zh_text:
+            await bot.send_message(chat_id, zh_text)
+    except Exception as e:
+        print(f"[voice error] {e}")
+        if zh_text:
+            await bot.send_message(chat_id, zh_text)  # 降级发文字
+```
+
+### 触发时机
+
+什么时候用声音，在 system prompt 里告诉他：
+
+```python
+SYSTEM_PROMPT += """
+
+当以下情况出现时，调用语音回复：
+- 这句话对你们来说很重要，值得用声音说出来
+- 用户明确要求语音回复
+
+调用方式：先正常回复文字，然后在代码里调用 send_voice_reply()，
+传入日文语音文本（ja_text）、中文配文（zh_text）和情绪（emotion）。
+"""
+```
+
+你也可以结合前一节的 `seb_action` 机制，让他在回复里嵌入动作标记，由 bot 自动拦截触发。
+
+---
+
 ## 部署前：验证一遍
 
 代码写完别急着往服务器上传——先在本地跑一遍，有问题当场解决，比上了线再排查省事多了。

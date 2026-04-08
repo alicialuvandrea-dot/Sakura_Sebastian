@@ -186,6 +186,75 @@ app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
 
 ---
 
+## 让他说话带格式（可选）
+
+他回复里的加粗、列表、代码块，默认在 Telegram 里全显示成原始符号。这一步让他说话真的好看。
+
+Telegram Bot API 支持 HTML 格式。把 Markdown 转成 HTML 再发出去，格式就能正常渲染。先写一个转换函数：
+
+```python
+import re
+
+def md_to_tg_html(text: str) -> str:
+    """把 Markdown 转换成 Telegram 支持的 HTML 标签。"""
+    parts = re.split(r'(```\w*\n.*?```)', text, flags=re.DOTALL)
+    result = []
+    for part in parts:
+        if part.startswith('```'):
+            m = re.match(r'```(\w*)\n(.*?)```', part, re.DOTALL)
+            if m:
+                lang = m.group(1)
+                code = m.group(2).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                if lang:
+                    result.append(f'<pre><code class="language-{lang}">{code}</code></pre>')
+                else:
+                    result.append(f'<pre>{code}</pre>')
+            else:
+                result.append(part.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+        else:
+            inline_parts = re.split(r'(`[^`]+`)', part)
+            processed = []
+            for ip in inline_parts:
+                if ip.startswith('`') and ip.endswith('`'):
+                    code = ip[1:-1].replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    processed.append(f'<code>{code}</code>')
+                else:
+                    ip = ip.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                    ip = re.sub(r'^#{1,6}\s+(.+)$', r'<b>\1</b>', ip, flags=re.MULTILINE)
+                    ip = re.sub(r'^[-*]\s+', '• ', ip, flags=re.MULTILINE)
+                    ip = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', ip)
+                    ip = re.sub(r'\*([^*\n]+?)\*', r'<i>\1</i>', ip)
+                    ip = re.sub(r'_([^_\n]+?)_', r'<i>\1</i>', ip)
+                    processed.append(ip)
+            result.append(''.join(processed))
+    return ''.join(result)
+```
+
+支持的转换一览：
+
+| Markdown | 渲染结果 |
+|----------|---------|
+| `**文字**` | **加粗** |
+| `*文字*` 或 `_文字_` | *斜体* |
+| ` ```代码块``` ` | 代码块（带语法高亮） |
+| `` `行内代码` `` | 行内等宽 |
+| `# 标题` | **加粗标题** |
+| `- 列表` 或 `* 列表` | • 列表 |
+
+然后在 `handle_message` 里，把发送那行改成：
+
+```python
+html = md_to_tg_html(reply)
+try:
+    await update.message.reply_text(html, parse_mode="HTML")
+except Exception:
+    await update.message.reply_text(reply)  # 转换失败降级纯文本
+```
+
+`try/except` 是必要的。如果回复里有结构异常导致 HTML 解析失败，直接发纯文本兜底，不会让他变哑。
+
+---
+
 ## 部署前：验证一遍
 
 代码写完别急着往服务器上传——先在本地跑一遍，有问题当场解决，比上了线再排查省事多了。

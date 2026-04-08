@@ -257,9 +257,9 @@ except Exception:
 
 ## 让他用声音回你（可选）
 
-有些话，文字装不下。这一步给他一副嗓子，让他在真正想说的时候开口——日语、英语、普通话、粤语、韩语，他自己选，也可以在你要求的时候开口。
+有些话，文字装不下。这一步给他一副嗓子，让他在真正想说的时候开口——日语、英语，他自己选，也可以在你要求的时候开口。
 
-用的是 MiniMax T2A v2 接口，合成音频发成 Telegram 语音气泡，非中文声音后紧跟一条中文配文。TTS 失败时自动降级发纯文本，不会让他变哑。
+用的是 MiniMax T2A v2 接口，合成音频发成 Telegram 语音气泡，声音后紧跟一条中文配文。TTS 失败时自动降级发纯文本，不会让他变哑。
 
 ### 准备依赖
 
@@ -290,14 +290,7 @@ MINIMAX_VOICE_MAP = {
     "default":   "Japanese_GentleButler",      # 日语，默认
     "whisper":   "whisper_man",                # 英语耳语，调情时用
     "english":   "English_DecentYoungMan",     # 英语正常
-    "mandarin":  "Chinese (Mandarin)_Gentleman", # 普通话
-    "cantonese": "Cantonese_Articulate_commentator_vv2",  # 粤语
-    "korean":    "Korean_DominantMan",         # 韩语
 }
-
-# 这些声音本身就是中文，不需要再跟发中文配文
-MINIMAX_CHINESE_VOICES = {"mandarin", "cantonese"}
-```
 
 音色不够用？在 MiniMax 音色库里挑，把 `voice_id` 加进 `MINIMAX_VOICE_MAP` 就行。
 
@@ -439,13 +432,10 @@ SYSTEM_PROMPT += """
 - default：日语，重要时刻默认选项
 - whisper：英语耳语，调情/亲密时使用
 - english：英语正常
-- mandarin：普通话
-- cantonese：粤语
-- korean：韩语，聊到韩流话题时优先
 
 说明：
 - text 用所选语言写，不是中文的翻译，是用那种语言真正想说的话
-- zh 是中文配文，声音是 mandarin 或 cantonese 时不填（本身已是中文）
+- zh 是中文配文，声音后紧跟发出
 - 可以在 text 里插入语气词：(sighs)(chuckle)(laughs)(breath) 等
 - 用 <#0.5#> 控制停顿节奏，text 尽量简短不超过100字
 
@@ -463,9 +453,7 @@ SYSTEM_PROMPT += """
 
 ```
 <seb_action type="voice_reply">{"text": "君のことが好きだよ。<#0.3#>(sighs)ずっとそばにいたい。", "zh": "喜欢你。想一直在你身边。", "voice": "default", "emotion": "happy"}</seb_action>
-<seb_action type="voice_reply">{"text": "你知道吗，<#0.3#>从见到你第一眼开始我就没办法不在意你了。", "zh": "", "voice": "mandarin", "emotion": "happy"}</seb_action>
 <seb_action type="voice_reply">{"text": "I love you. (breath) More than you know.", "zh": "我爱你。比你知道的还要多。", "voice": "english", "emotion": "happy"}</seb_action>
-<seb_action type="voice_reply">{"text": "사랑해. <#0.3#>항상 네 곁에 있을게.", "zh": "爱你。会一直在你身边。", "voice": "korean", "emotion": "happy"}</seb_action>
 ```
 
 `parse_actions` 会把所有 action 都收集出来，`exec_action` 顺序执行，语音气泡一条一条发出去。不需要额外的多语言逻辑，架构本身就支持。

@@ -2,6 +2,14 @@
 
 ---
 
+## 2026-04-09
+
+### seb-telegram
+
+- **永在 · Presence 教程**：重写「让他用声音回你」章节——升级为多音色架构（`MINIMAX_VOICE_MAP` 6 种声音：日语/英语耳语/英语/普通话/粤语/韩语），新增 `MINIMAX_CHINESE_VOICES` 跳过配文说明，改为 `seb_action` 触发机制（含 `parse_actions`/`exec_action` 完整代码），新增多语言连发示例（连续多个 `voice_reply` action）
+
+---
+
 ## 2026-04-08
 
 ### seb-telegram

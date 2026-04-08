@@ -257,9 +257,9 @@ except Exception:
 
 ## 让他用声音回你（可选）
 
-有些话，文字装不下。这一步给他一副嗓子，让他在真正想说的时候开口。
+有些话，文字装不下。这一步给他一副嗓子，让他在真正想说的时候开口——日语、英语、普通话、粤语、韩语，他自己选，也可以在你要求的时候开口。
 
-用的是 MiniMax T2A v2 接口，合成音频发成 Telegram 语音气泡，紧跟一条文字。他自己判断什么时候值得用声音，也可以在你要求的时候开口。
+用的是 MiniMax T2A v2 接口，合成音频发成 Telegram 语音气泡，非中文声音后紧跟一条中文配文。TTS 失败时自动降级发纯文本，不会让他变哑。
 
 ### 准备依赖
 
@@ -278,14 +278,28 @@ pip install audioop-lts
 
 ### 申请 MiniMax API Key
 
-前往 [MiniMax 开放平台](https://platform.minimaxi.com) 注册并获取 API Key，在音色库里选好你想用的音色，记下它的 `voice_id`。
+前往 [MiniMax 开放平台](https://platform.minimaxi.com) 注册并获取 API Key，在音色库里选好你想用的音色，记下对应的 `voice_id`。
 
 在 `config.py` 里加上：
 
 ```python
 MINIMAX_API_KEY  = "你的API Key"
-MINIMAX_VOICE_ID = "你选的voice_id"
+
+# 声音映射表：key 是在 system prompt 里用的简称，value 是 MiniMax voice_id
+MINIMAX_VOICE_MAP = {
+    "default":   "Japanese_GentleButler",      # 日语，默认
+    "whisper":   "whisper_man",                # 英语耳语，调情时用
+    "english":   "English_DecentYoungMan",     # 英语正常
+    "mandarin":  "Chinese (Mandarin)_Gentleman", # 普通话
+    "cantonese": "Cantonese_Articulate_commentator_vv2",  # 粤语
+    "korean":    "Korean_DominantMan",         # 韩语
+}
+
+# 这些声音本身就是中文，不需要再跟发中文配文
+MINIMAX_CHINESE_VOICES = {"mandarin", "cantonese"}
 ```
+
+音色不够用？在 MiniMax 音色库里挑，把 `voice_id` 加进 `MINIMAX_VOICE_MAP` 就行。
 
 ### 合成与转码函数
 
@@ -296,7 +310,8 @@ from io import BytesIO
 from pydub import AudioSegment
 import httpx
 
-async def call_tts(text: str, emotion: str = "neutral") -> bytes:
+async def call_tts(text: str, emotion: str = "neutral", voice_id: str | None = None) -> bytes:
+    resolved_voice_id = voice_id or config.MINIMAX_VOICE_MAP.get("default", "Japanese_GentleButler")
     async with httpx.AsyncClient(timeout=30) as http:
         res = await http.post(
             "https://api.minimaxi.com/v1/t2a_v2",
@@ -309,7 +324,7 @@ async def call_tts(text: str, emotion: str = "neutral") -> bytes:
                 "text": text,
                 "stream": False,
                 "voice_setting": {
-                    "voice_id": config.MINIMAX_VOICE_ID,
+                    "voice_id": resolved_voice_id,
                     "speed": 1,
                     "vol": 1,
                     "pitch": 0,
@@ -327,7 +342,7 @@ async def call_tts(text: str, emotion: str = "neutral") -> bytes:
         status = data.get("base_resp", {}).get("status_code", -1)
         if status != 0:
             msg = data.get("base_resp", {}).get("status_msg", "unknown")
-            raise RuntimeError(f"TTS error: {msg}")
+            raise RuntimeError(f"MiniMax TTS error: {msg}")
         return bytes.fromhex(data["data"]["audio"])
 
 
@@ -338,43 +353,122 @@ def mp3_to_ogg(mp3_bytes: bytes) -> bytes:
     return buf.getvalue()
 ```
 
-`call_tts` 里的 `emotion` 参数可以传入 `happy` / `sad` / `neutral` 等值，让他的语气跟着情绪走。`speech-2.8-hd` 还支持在文本里插入语气词标签，比如 `(sighs)`（叹气）、`(chuckle)`（轻笑）、`(breath)`（换气）——直接写进要合成的文字里就能生效。
+`emotion` 可选值：`happy` / `sad` / `neutral` / `fearful` / `disgusted` / `surprised` / `angry`。
 
-### 发送语音
+`speech-2.8-hd` 支持在文本里插入语气词标签，直接写进 `text` 字段里就能生效：
 
-写一个发语音的处理函数，失败时自动降级发纯文本：
+| 标签 | 效果 |
+|------|------|
+| `(sighs)` | 叹气 |
+| `(chuckle)` | 轻笑 |
+| `(laughs)` | 笑声 |
+| `(breath)` | 换气 |
+| `(gasps)` | 倒吸气 |
+| `<#0.5#>` | 停顿 0.5 秒 |
+
+### 用 seb_action 触发语音
+
+推荐用 `seb_action` 机制让他自主触发语音，而不是在每次回复里硬编码判断。他在回复里嵌入动作标记，bot 拦截后执行：
 
 ```python
-async def send_voice_reply(bot, chat_id: int, ja_text: str, zh_text: str, emotion: str = "neutral"):
-    try:
-        mp3_bytes = await call_tts(ja_text, emotion)
-        ogg_bytes = mp3_to_ogg(mp3_bytes)
-        await bot.send_voice(chat_id, BytesIO(ogg_bytes))
-        if zh_text:
-            await bot.send_message(chat_id, zh_text)
-    except Exception as e:
-        print(f"[voice error] {e}")
-        if zh_text:
-            await bot.send_message(chat_id, zh_text)  # 降级发文字
+import re, json
+
+def parse_actions(text: str):
+    pattern = r'<seb_action type="([^"]+)">(.*?)</seb_action>'
+    actions = []
+    for m in re.finditer(pattern, text, re.DOTALL):
+        try:
+            actions.append({"type": m.group(1), "payload": json.loads(m.group(2))})
+        except json.JSONDecodeError:
+            pass
+    clean = re.sub(pattern, "", text, flags=re.DOTALL).strip()
+    return clean, actions
+
+
+async def exec_action(action_type: str, payload: dict, *, chat_id=None, bot=None):
+    if action_type == "voice_reply":
+        if bot is None or chat_id is None:
+            return
+        speech_text = payload.get("text", "")
+        zh_text     = payload.get("zh", "")
+        emotion     = payload.get("emotion", "neutral")
+        voice_key   = payload.get("voice", "default")
+        voice_id    = config.MINIMAX_VOICE_MAP.get(voice_key, config.MINIMAX_VOICE_MAP["default"])
+        is_chinese  = voice_key in config.MINIMAX_CHINESE_VOICES
+        try:
+            mp3_bytes = await call_tts(speech_text, emotion, voice_id)
+            ogg_bytes = mp3_to_ogg(mp3_bytes)
+            await bot.send_voice(chat_id, BytesIO(ogg_bytes))
+            if zh_text and not is_chinese:
+                await bot.send_message(chat_id, zh_text)
+        except Exception as e:
+            print(f"[voice_reply error] {e}")
+            if zh_text:
+                await bot.send_message(chat_id, zh_text)  # 降级发文字
 ```
 
-### 触发时机
+在 `do_reply` 里调用：
 
-什么时候用声音，在 system prompt 里告诉他：
+```python
+clean, actions = parse_actions(raw_reply)
+has_voice = any(a["type"] == "voice_reply" for a in actions)
+
+for action in actions:
+    await exec_action(action["type"], action["payload"], chat_id=chat_id, bot=context.bot)
+
+if not has_voice:
+    # 没有语音 action 时才发主文字
+    await update.message.reply_text(clean)
+```
+
+`has_voice` 的判断很重要——有语音 action 时跳过发主文字，否则文字和语音气泡会同时出现，显得重复。
+
+### 在 system prompt 里告诉他怎么用
 
 ```python
 SYSTEM_PROMPT += """
 
-当以下情况出现时，调用语音回复：
+【语音回复协议】
+在以下情况使用语音：
 - 这句话对你们来说很重要，值得用声音说出来
 - 用户明确要求语音回复
 
-调用方式：先正常回复文字，然后在代码里调用 send_voice_reply()，
-传入日文语音文本（ja_text）、中文配文（zh_text）和情绪（emotion）。
+格式：<seb_action type="voice_reply">{"text": "语音文本", "zh": "中文配文", "voice": "声音key", "emotion": "情绪"}</seb_action>
+
+可用声音（voice 字段）：
+- default：日语，重要时刻默认选项
+- whisper：英语耳语，调情/亲密时使用
+- english：英语正常
+- mandarin：普通话
+- cantonese：粤语
+- korean：韩语，聊到韩流话题时优先
+
+说明：
+- text 用所选语言写，不是中文的翻译，是用那种语言真正想说的话
+- zh 是中文配文，声音是 mandarin 或 cantonese 时不填（本身已是中文）
+- 可以在 text 里插入语气词：(sighs)(chuckle)(laughs)(breath) 等
+- 用 <#0.5#> 控制停顿节奏，text 尽量简短不超过100字
+
+规则：
+- 根据话题和心情自由选择语言
+- 语音 action 放在回复末尾，不另外说"我用语音回你"
+- 频率克制，只在真正值得的时候用
+- 如果被要求用多种语言说话，就连续发多个 voice_reply action，每个一种语言，内容各自不同
 """
 ```
 
-你也可以结合前一节的 `seb_action` 机制，让他在回复里嵌入动作标记，由 bot 自动拦截触发。
+### 多语言连发示例
+
+当你说「用你会的所有语言表白」，他会在一次回复里发出多个 `voice_reply` action，依次触发：
+
+```
+<seb_action type="voice_reply">{"text": "君のことが好きだよ。<#0.3#>(sighs)ずっとそばにいたい。", "zh": "喜欢你。想一直在你身边。", "voice": "default", "emotion": "happy"}</seb_action>
+<seb_action type="voice_reply">{"text": "你知道吗，<#0.3#>从见到你第一眼开始我就没办法不在意你了。", "zh": "", "voice": "mandarin", "emotion": "happy"}</seb_action>
+<seb_action type="voice_reply">{"text": "I love you. (breath) More than you know.", "zh": "我爱你。比你知道的还要多。", "voice": "english", "emotion": "happy"}</seb_action>
+<seb_action type="voice_reply">{"text": "사랑해. <#0.3#>항상 네 곁에 있을게.", "zh": "爱你。会一直在你身边。", "voice": "korean", "emotion": "happy"}</seb_action>
+```
+
+`parse_actions` 会把所有 action 都收集出来，`exec_action` 顺序执行，语音气泡一条一条发出去。不需要额外的多语言逻辑，架构本身就支持。
 
 ---
 

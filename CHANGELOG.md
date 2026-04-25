@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-04-25
+
+### 全库
+
+- **API 引用更新**：教程中 `dzzi.ai` 引用替换为当前可用 API（DeepSeek / aihubmix），dzzi 已停止提供 Claude 中转服务；Grok 视觉部分从 dzzi 改为 aihubmix 中转（Grok 模型本身不变）
+- **模型名更新**：技术栈描述中 Claude 模型替换为 DeepSeek V4，与当前实际运行环境一致
+
+### clawd-pet
+
+- **移除 dzzi 余额监控**：教程中 `DZZI_API_KEY` / `DZZI_SESSION_TOKEN` 配置项和相关动画状态（eat/warn）已移除，dzzi 服务不可用
+
+---
+
 ## 2026-04-09
 
 ### seb-telegram

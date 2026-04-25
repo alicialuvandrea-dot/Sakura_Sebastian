@@ -1,7 +1,7 @@
 TELEGRAM_TOKEN  = "YOUR_TELEGRAM_BOT_TOKEN"
-API_KEY         = "YOUR_CLAUDE_API_KEY"
-API_BASE        = "https://api.dzzi.ai/v1"
-MODEL           = "[按量]claude-opus-4-6"
+API_KEY         = "YOUR_API_KEY"
+API_BASE        = "https://api.deepseek.com/v1"  # 或其他 OpenAI 兼容 API
+MODEL           = "deepseek-v4-pro"
 
 SUPABASE_URL    = "https://your-project.supabase.co"
 SUPABASE_KEY    = "YOUR_SUPABASE_ANON_KEY"
@@ -18,8 +18,8 @@ MAX_TOKENS      = 4096
 NOTION_TOKEN    = "YOUR_NOTION_TOKEN"
 PROACTIVE_HOURS = 5
 
-# ── Grok Vision（图片分析）─────────────────────────────────────────────────────
+# ── Grok Vision（NSFW 图片描述）───────────────────────────────────────────────
 GROK_KEY        = "YOUR_GROK_API_KEY"
-GROK_BASE       = "https://api.dzzi.ai/v1"
-GROK_MODEL      = "x-ai/grok-4.1-fast"
+GROK_BASE       = "https://aihubmix.com/v1"  # Grok 中转
+GROK_MODEL      = "grok-4-1-fast-non-reasoning"
 GROK_MAX_TOKENS = 1024

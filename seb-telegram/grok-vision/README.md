@@ -107,8 +107,8 @@ sudo systemctl start imghost
 
 ```python
 GROK_KEY        = "your-grok-api-key"
-GROK_BASE       = "https://api.dzzi.ai/v1"
-GROK_MODEL      = "x-ai/grok-4.1-fast"
+GROK_BASE       = "https://aihubmix.com/v1"   # Grok 中转
+GROK_MODEL      = "grok-4-1-fast-non-reasoning"
 GROK_MAX_TOKENS = 1024
 IMGHOST_DIR     = "/home/ubuntu/imghost/files"
 IMGHOST_URL     = "https://imghost.sebsakura.top"

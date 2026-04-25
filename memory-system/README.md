@@ -83,8 +83,8 @@ python seb_mem.py add <type> <title> <content> [tags...]  # 手动写入
 SUPABASE_URL = "https://<your-project>.supabase.co"
 SUPABASE_KEY = "<anon-key>"
 API_KEY      = "<openai-compatible-key>"
-API_BASE     = "https://api.dzzi.ai/v1"   # 或其他 OpenAI 兼容中转
-MODEL        = "claude-haiku-4-5-20251001"
+API_BASE     = "https://api.deepseek.com/v1"  # 或其他 OpenAI 兼容 API
+MODEL        = "deepseek-v4-flash"           # 轻量模型，提取摘要够用
 
 INJECT_CONTENT_MAX = 300           # 单条记忆的内容截断长度
 MEMORY_MD_PATH     = r"C:\Users\<you>\MEMORY.md"  # 本地技术档案路径

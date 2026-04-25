@@ -10,7 +10,7 @@
 
 - 一台 VPS（Linux，Ubuntu 最省事）
 - 一个 Telegram Bot Token（去找 @BotFather，`/newbot`，按提示走）
-- 一个兼容 OpenAI 格式的 API（比如 dzzi.ai 这种中转）
+- 一个兼容 OpenAI 格式的 API（比如 DeepSeek 的 API，或者你用惯的中转站）
 - SSH 能连上你的服务器
 
 ---

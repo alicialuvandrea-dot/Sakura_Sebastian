@@ -14,7 +14,7 @@
 clawd-pet/
 ├── clawd.py         # 主程序：状态机、渲染、鼠标交互
 ├── sprites.py       # 像素精灵：所有动画帧定义
-├── monitor.py       # 监控器：dzzi.ai 余额 + Claude Code 进程 + Hook 服务器
+├── monitor.py       # 监控器：Claude Code 进程 + Hook 服务器
 ├── config.py        # 用户配置：API Key / Session Token / 缩放
 ├── hook_sender.py   # Claude Code hooks 转发器（自动调用）
 └── start_clawd.bat  # 双击启动（Windows）
@@ -34,17 +34,13 @@ pip install requests psutil
 
 ## 配置
 
-告诉它你在用哪个账号，这样它才知道余额涨了该高兴、余额低了该警告。
+调整缩放和外观让它适合你的桌面。
 
 编辑 `config.py`：
 
 ```python
-DZZI_API_KEY = "YOUR_DZZI_API_KEY"
-DZZI_SESSION_TOKEN = ""  # 可选，查不到余额时填入
 SCALE = 8
 ```
-
-获取 Session Token：登录 https://api.dzzi.ai/console/topup → F12 → Application → Local Storage → `token`
 
 ---
 
@@ -81,8 +77,8 @@ pythonw clawd.py
 | petted | 单击 |
 | dizzy | 快速连点 5+ 次 |
 | fly | 长按 500ms 拖动，松手落地 |
-| eat | dzzi.ai 余额增加 |
-| warn | dzzi.ai 余额低于 ¥1 |
+| eat | 任意交互累加，连续多次触发 |
+| warn | 长时间无操作提醒 |
 | sakura | 右键菜单 / 随机小概率 |
 
 ---

@@ -2,6 +2,19 @@
 
 ---
 
+## 2026-07-13
+
+### clawd-pet
+
+- **打包兼容性修复**：`.bat` 文件名从 `启动Clawd.bat`（中文）改为 `start.bat`（ASCII）——Windows 原生压缩工具对中文文件名按系统代码页编码，跨设备解压后文件名损坏
+- **启动脚本增强**：`start.bat` 新增 Python 自动搜索（PATH → 常见安装目录），找不到时弹提示而非静默退出
+- **换行符修复**：所有 `.bat` 文件统一 CRLF（`\r\n`），避免 Git Bash / Linux 环境编辑后 LF 换行导致老版 cmd.exe 解析失败
+- **依赖精简**：移除 `requests`，不再需要（dzzi 余额监控功能已在 v0.2 移除）
+- **新增打包辅助文件**：`.gitignore`（排除 `__pycache__/`、`.git/`、密钥文件）和 `requirements.txt`
+- **教程更新**：新增「打包与跨设备分享」章节——记录 .bat 中文名损坏、LF/CRLF 换行、打包排除项三个坑及解法
+
+---
+
 ## 2026-04-26
 
 ### grok-vision
